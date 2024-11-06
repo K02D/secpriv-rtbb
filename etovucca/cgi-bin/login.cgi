@@ -37,6 +37,7 @@ try:
                 # CGI Redirect: https://stackoverflow.com/a/6123179
                 print('Content-Type: text/html')
                 print('Location: %s' % redirectURL)
+                # Include this cookie in a CSRF request which requires admin privileges
                 C = SimpleCookie()
                 C['user'] = h.hexdigest() # U+1F914
                 print(C)
