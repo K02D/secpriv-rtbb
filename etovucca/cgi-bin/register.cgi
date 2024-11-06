@@ -12,8 +12,9 @@ render_register() {
 
 register_voter() {
     id=`$PATH_TO_MACHINE add-voter ${array[name]} ${array[county]} ${array[zipc]} ${array[dob]}`
+    name=`echo ${array[name]}`
     if [ ! $id -eq 0 ]; then
-        echo "<b>Voter registered. ID: $id</b>"
+        echo "<b>Voter name $name registered. ID: $id</b>"
     else
         echo "<b>Error in registering voter. Please try again.</b>"
     fi
