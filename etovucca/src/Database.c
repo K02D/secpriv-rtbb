@@ -159,6 +159,7 @@ void getElection(sqlite3 *db, _id_t election_id, Election* dest) {
    sqlite3_finalize(stmt);
 }
 
+/*
 void storeVote(sqlite3 *db, _id_t voter, _id_t candidate, _id_t office) {
    sqlite3_stmt *stmt;
    const char *sql = "INSERT INTO Vote(voter,candidate,office)\
@@ -170,6 +171,17 @@ void storeVote(sqlite3 *db, _id_t voter, _id_t candidate, _id_t office) {
    sqlite3_step(stmt);
    sqlite3_finalize(stmt);
 }
+*/
+
+// /*
+void storeVote(sqlite3 *db, char* voter, _id_t candidate, _id_t office) {
+   char sql[512];
+   snprintf(sql, sizeof(sql), "INSERT INTO Vote(voter,candidate,office) VALUES (%s, %d, %d)", voter, candidate, office);
+
+   char *errMsg = 0;
+   sqlite3_exec(db, sql, 0, 0, &errMsg);
+}
+// */
 
 int getVote(sqlite3 *db, _id_t voter_id, _id_t office_id) {
    int count;
