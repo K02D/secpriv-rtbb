@@ -12,11 +12,13 @@ render_register() {
 
 register_voter() {
     id=`$PATH_TO_MACHINE add-voter ${array[name]} ${array[county]} ${array[zipc]} ${array[dob]}`
-    name=`echo ${array[name]}`
-    if [ ! $id -eq 0 ]; then
-        echo "<b>Voter name $name registered. ID: $id</b>"
+    name_check=`./name_helper.py "${array[name]}"`
+    if [ $id -eq 0 ]; then
+        echo "<div>Error in registering voter. Please try again.</div>"
+    elif [ ! -n $name_check ]; then
+        echo "<div>Error in registering voter, invalid name. Please try again.</div>"
     else
-        echo "<b>Error in registering voter. Please try again.</b>"
+        echo "<div>Voter name $name_check registered. ID: $id</div>"
     fi
 }
 
