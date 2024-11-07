@@ -3,6 +3,8 @@
 import cgi
 import subprocess
 import json
+import tempfile
+import os
 
 PATH_TO_MACHINE = "./etovucca"
 PATH_TO_SQLITE = "./sqlite3"
@@ -10,12 +12,10 @@ PATH_TO_DB = "rtbb.sqlite3"
 ID_SQL = 'SELECT id FROM Election WHERE deadline_day={} AND deadline_mon={} AND deadline_year={}'
 
 def convert_date_to_id(date):
-    # Please don't ever actually do this.
     date_positions = date.split("-")
-    sql = ID_SQL.format(date_positions[2], date_positions[1], int(date_positions[0]) - 1900) # U+1F914
+    sql = ID_SQL.format(date_positions[2], date_positions[1], int(date_positions[0]) - 1900)
     election_id = int(subprocess.check_output([PATH_TO_SQLITE, PATH_TO_DB, sql]))
     return election_id
-
 
 print("Content-Type: text/html")
 print()
@@ -30,17 +30,30 @@ try:
     if len(form) != 0:
         ids = form.getvalue('election').split('_')
         unique_office_id = str(elections[ids[0]]['offices'][int(ids[1])]['id'])
-        unqiue_candidate_id = str(elections[ids[0]]['offices'][int(ids[1])]['candidates'][int(ids[2])]['id'])
+        unique_candidate_id = str(elections[ids[0]]['offices'][int(ids[1])]['candidates'][int(ids[2])]['id'])
         subprocess.check_output(
-            [PATH_TO_MACHINE, 'vote', form.getvalue('voterId'), str(convert_date_to_id(ids[0])), unique_office_id, unqiue_candidate_id])
-        print('<b>Sucessfully cast ballot.</b>')
+            [PATH_TO_MACHINE, 'vote', form.getvalue('voterId'), str(convert_date_to_id(ids[0])), unique_office_id, unique_candidate_id])
+        
+        election_date = ids[0]
+        office_name = elections[ids[0]]['offices'][int(ids[1])]['name']
+        candidate_name = elections[ids[0]]['offices'][int(ids[1])]['candidates'][int(ids[2])]['name']
+        
+        receipt_file_path = f"./receipts/receipt_{form.getvalue('voterId')}.txt"
+        with open(receipt_file_path, "w") as receipt_file:
+            receipt_file.write(f"Vote Confirmation Receipt\n")
+            receipt_file.write(f"Voter ID: {form.getvalue('voterId')}\n")
+            receipt_file.write(f"Election Date: {election_date}\n")
+            receipt_file.write(f"Office: {office_name}\n")
+            receipt_file.write(f"Candidate: {candidate_name}\n")
+
+        print('<b>Successfully cast ballot.</b>')
         print('<ul>')
-        print('<li>Election Date: {}</li>'.format(ids[0]))
-        print(
-            '<li>Office: {}</li>'.format(elections[ids[0]]['offices'][int(ids[1])]['name']))
-        print('<li>Candidate: {}</li>'.format(
-            elections[ids[0]]['offices'][int(ids[1])]['candidates'][int(ids[2])]['name']))
+        print(f'<li>Election Date: {election_date}</li>')
+        print(f'<li>Office: {office_name}</li>')
+        print(f'<li>Candidate: {candidate_name}</li>')
         print('</ul>')
+        print(f'<a href="./download_receipt.cgi?file=receipt_{form.getvalue("voterId")}.txt">Download Receipt</a>')
+
     else:
         print('<form method="post">')
         print('<label for="voterId">Voter ID</label><br>')
