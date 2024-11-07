@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX_NAME_LEN 128 /* arbitrary, but may be passed on stack */
+#define MAX_NAME_LEN 8000 /* arbitrary, but may be passed on stack */
 typedef int _id_t;
 
 typedef struct {
