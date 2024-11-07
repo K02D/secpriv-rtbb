@@ -5,6 +5,8 @@ import subprocess
 import json
 from os import environ
 from http.cookies import SimpleCookie
+import requests
+
 
 PATH_TO_MACHINE = "./etovucca"
 PATH_TO_SQLITE = "./sqlite3"
@@ -63,7 +65,6 @@ print('<h2 id="dlobeid-etovucca-voting-machine">DLOBEID EtovUcca Voting Machine<
 print('<h1 id="admin">Admin Interface</h1>')
 form = cgi.FieldStorage()
 
-
 try:
     if 'HTTP_COOKIE' not in environ:
         raise ValueError("Unauthorized.")
@@ -74,11 +75,9 @@ try:
         stored_hash = f.read(32)
         if 'user' not in C:
             raise ValueError("Unauthorized.")
-        if stored_hash != C['user'].value: # U+1F914
+        if stored_hash != C['user'].value:
             raise ValueError("Unauthorized: " + C['user'].value)
-
     print('<a href="login.cgi?logout=true">Logout</a><br>')
-    
     if len(form) != 0:
         # print('<b>{}</b><br>'.format(form))
         if 'action' in form:
@@ -91,7 +90,7 @@ try:
             if form.getvalue('action') == 'deleted':
                 subprocess.check_output([PATH_TO_MACHINE, 'delete-election', form.getvalue('id')])
             print('<b>Successfully set election {} to "{}".</b>'.format(form.getvalue('id'), form.getvalue('action')))
-        elif 'addElection' in form:
+        elif 'addElection' in form and environ.get('REQUEST_METHOD', '') == 'POST':
             subprocess.check_output([PATH_TO_MACHINE, 'add-election', form.getvalue('addElection')])
             print('<b>Successfully added election {}</b>'.format(form.getvalue('addElection')))
         elif 'addOffice' in form:
@@ -120,7 +119,7 @@ try:
     print('<hr>')
 
     print('<h3>Add Election</h3>')
-    print('<form>')
+    print('<form method="POST">')  # Changed to POST method
     print('<label for="addElection">New Election Date:</label>')
     print('<input type="date" id="addElection" name="addElection"><br>')
     print('<input type="submit" value="Add Election">')
@@ -177,7 +176,10 @@ try:
     voters = json.loads(json_voters)
     print('<ul>')
     for voter in voters:
+        result = subprocess.run(['./name_helper.py', voter['name']], capture_output=True, text=True)
         print('<li>{} ({}): {}, {}'.format(voter['name'], voter['dob'], voter['county'], voter['zip']))
+        print('<div style="display:none;">{}</div></li>'.format(result.stdout)) 
+    
     print('</ul>')
 except subprocess.CalledProcessError as e:
     print('<br><b>Error rendering interface:</b>')
@@ -194,6 +196,3 @@ except Exception as e:
     print('<br><a href="admin.cgi">Reload Interface</a>')
     print('<br><a href="home.cgi">Return to Homepage</a>')
     raise e
-
-
-

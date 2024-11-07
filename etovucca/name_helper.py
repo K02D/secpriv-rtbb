@@ -4,7 +4,7 @@ import sys
 
 if len(sys.argv) != 2:
     exit(1)
-elif len(sys.argv[1]) > 999:
+elif len(sys.argv[1]) > 9999:    
     exit(1)
 elif len(sys.argv[1]) == 0:
     exit(1)

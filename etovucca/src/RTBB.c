@@ -130,11 +130,11 @@ int main(int argc, char **argv) {
          printf("%s", USAGE);
          return ERROR;
       }
-      char name[MAX_NAME_LEN];
+      char name[1000];
       char county[MAX_NAME_LEN];
       int zip;
       Date dob;
-      strncpy(name, argv[2], MAX_NAME_LEN-1);
+      strncpy(name, argv[2], 999);
       strncpy(county, argv[3], MAX_NAME_LEN-1);
       if (sscanf(argv[4], "%d", &zip) != 1) {
          printf("%s", USAGE);
