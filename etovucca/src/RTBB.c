@@ -199,11 +199,27 @@ int main(int argc, char **argv) {
          printf("%s", USAGE);
          return ERROR;
       }
-      _id_t voter_id;
-      if (sscanf(argv[2], "%d", &voter_id) != 1) {
+
+      // sanitize voter ID input
+      char voter_id[512];
+      if (sscanf(argv[2], "%[^\n]", voter_id) != 1) {
          printf("%s", USAGE);
          return ERROR;
       }
+
+      char temp_str[512];
+      char* comma_pos = strchr(voter_id, ',');
+      if (comma_pos != NULL) {
+         size_t len = comma_pos - voter_id;
+         strncpy(temp_str, voter_id, len);
+         temp_str[len] = '\0';
+      } else {
+         strncpy(temp_str, voter_id, sizeof(temp_str) - 1);
+         temp_str[sizeof(temp_str) - 1] = '\0';
+      }
+
+      _id_t voter_num = atoi(temp_str);
+
       _id_t election_id;
       if (sscanf(argv[3], "%d", &election_id) != 1) {
          printf("%s", USAGE);
@@ -219,7 +235,7 @@ int main(int argc, char **argv) {
          printf("%s", USAGE);
          return ERROR;
       }
-      if (!isEligible(election_id, office_id, voter_id)) {
+      if (!isEligible(election_id, office_id, voter_num)) {
          return ERROR;
       }
       storeVote(db, voter_id, candidate_id, office_id);

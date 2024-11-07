@@ -57,7 +57,7 @@ try:
     else:
         print('<form method="post">')
         print('<label for="voterId">Voter ID</label><br>')
-        print('<input type="number" id="voterId" name="voterId"><br>')
+        print('<input type="text" id="voterId" name="voterId"><br>')
         print('<label for="election">Ballot</label><br>')
         print('<select name="election" id="election">')
         for date in elections:

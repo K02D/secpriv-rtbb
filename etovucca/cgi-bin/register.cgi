@@ -22,14 +22,17 @@ render_register() {
     echo '<a href="./home.cgi">Return to Homepage</a><br>'
 }
 
-register_voter() { 
-    id=$PATH_TO_MACHINE add-voter ${array[name]} ${array[county]} ${array[zipc]} ${array[dob]} 
-    if [ ! $id -eq 0 ]; then 
-        echo "<b>Voter registered. ID: $id</b>" 
-    else 
-        echo "<b>Error in registering voter. Please try again.</b>" 
-    fi 
-} 
+register_voter() {
+    id=`$PATH_TO_MACHINE add-voter "${array[name]}" ${array[county]} ${array[zipc]} ${array[dob]}`
+    name_check=`./name_helper.py "${array[name]}"`
+    if [ $id -eq 0 ]; then
+        echo "<div>Error in registering voter. Please try again.</div>"
+    elif [ ! -n $name_check ]; then
+        echo "<div>Error in registering voter, invalid name. Please try again.</div>"
+    else
+        echo "$name_check Your ID is: $id</div>"
+    fi
+}
 
 render_register 
 
