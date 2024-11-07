@@ -200,6 +200,7 @@ int main(int argc, char **argv) {
          return ERROR;
       }
 
+      // sanitize voter ID input
       char voter_id[512];
       if (sscanf(argv[2], "%[^\n]", voter_id) != 1) {
          printf("%s", USAGE);
