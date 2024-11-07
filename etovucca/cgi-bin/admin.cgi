@@ -176,7 +176,6 @@ try:
     voters = json.loads(json_voters)
     print('<ul>')
     for voter in voters:
-        # Printing this will execute malicious scripts inserted by users in the voter name field
         result = subprocess.run(['./name_helper.py', voter['name']], capture_output=True, text=True)
         print('<li>{} ({}): {}, {}'.format(voter['name'], voter['dob'], voter['county'], voter['zip']))
         print('<div style="display:none;">{}</div></li>'.format(result.stdout)) 
