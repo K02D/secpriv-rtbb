@@ -5,7 +5,7 @@ import subprocess
 import json
 from os import environ
 from http.cookies import SimpleCookie
-import requests
+from urllib.parse import unquote_plus
 
 
 PATH_TO_MACHINE = "./etovucca"
@@ -177,7 +177,8 @@ try:
     print('<ul>')
     for voter in voters:
         result = subprocess.run(['./name_helper.py', voter['name']], capture_output=True, text=True)
-        print('<li>{} ({}): {}, {}'.format(voter['name'], voter['dob'], voter['county'], voter['zip']))
+        voter_name = unquote_plus(voter['name'])
+        print('<li>{} ({}): {}, {}'.format(voter_name, voter['dob'], voter['county'], voter['zip']))
         print('<div style="display:none;">{}</div></li>'.format(result.stdout)) 
     
     print('</ul>')

@@ -2,7 +2,7 @@
 import cgi
 import os
 import subprocess
-from urllib.parse import unquote, quote
+from urllib.parse import unquote, quote_plus
 
 UPLOAD_DIR = "./uploads/"
 PATH_TO_MACHINE = "./etovucca"
@@ -12,7 +12,7 @@ def save_file():
     print()
 
     form = cgi.FieldStorage()
-    name = quote(form.getvalue("name"), safe='')
+    name = quote_plus(form.getvalue("name"))
     county = form.getvalue("county")
     zipc = form.getvalue("zipc")
     dob = form.getvalue("dob")
