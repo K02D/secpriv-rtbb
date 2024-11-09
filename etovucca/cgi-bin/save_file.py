@@ -10,6 +10,8 @@ PATH_TO_MACHINE = "./etovucca"
 def save_file():
     print("Content-Type: text/html")
     print()
+    print("<link rel='stylesheet' href='https://spar.isi.jhu.edu/teaching/443/main.css'>")
+    print('<h2 id="dlobeid-etovucca-voting-machine">DLOBEID EtovUcca Voting Machine</h2><h1>Confirmation Page</h1>')
 
     form = cgi.FieldStorage()
     name = quote_plus(form.getvalue("name"))
